@@ -10,15 +10,16 @@
  * @license    https://www.coreshop.org/license     GNU General Public License version 3 (GPLv3)
 */
 
-namespace CoreShop\Bundle\CoreBundle;
+namespace CoreShop\Bundle\MembersBridgeBundle;
 
-use CoreShop\Bundle\CoreBundle\DependencyInjection\Compiler\RegisterReportsPass;
-use CoreShop\Bundle\CoreBundle\DependencyInjection\Compiler\TranslatableEntityLocalePass;
+use CoreShop\Bundle\CustomerBundle\DependencyInjection\Compiler\CompositeCustomerContextPass;
+use CoreShop\Bundle\CustomerBundle\DependencyInjection\Compiler\CompositeRequestResolverPass;
+use CoreShop\Bundle\MembersBridgeBundle\DependencyInjection\Compiler\RestrictableRepositoryCompiler;
 use CoreShop\Bundle\ResourceBundle\AbstractResourceBundle;
 use CoreShop\Bundle\ResourceBundle\CoreShopResourceBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class CoreShopCoreBundle extends AbstractResourceBundle
+final class CoreShopMembersBridgeBundle extends AbstractResourceBundle
 {
     /**
      * {@inheritdoc}
@@ -26,19 +27,15 @@ final class CoreShopCoreBundle extends AbstractResourceBundle
     public function getSupportedDrivers()
     {
         return [
-            CoreShopResourceBundle::DRIVER_DOCTRINE_ORM,
+
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
 
-        $container->addCompilerPass(new TranslatableEntityLocalePass());
-        $container->addCompilerPass(new RegisterReportsPass());
+        $container->addCompilerPass(new RestrictableRepositoryCompiler());
     }
 
     /**
@@ -46,6 +43,6 @@ final class CoreShopCoreBundle extends AbstractResourceBundle
      */
     protected function getModelNamespace()
     {
-        return 'CoreShop\Component\Core\Model';
+        return 'CoreShop\Bridge\MembersBridge\Model';
     }
 }

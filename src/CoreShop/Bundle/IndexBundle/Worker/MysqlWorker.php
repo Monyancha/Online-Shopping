@@ -61,7 +61,7 @@ class MysqlWorker extends AbstractWorker
      */
     protected function processTable(IndexInterface $index)
     {
-        $classHelper = $this->classHelperRegistry->has($index->getClass()) ? $this->classHelperRegistry->get($index->getClass()) : null;
+        $classHelpers = $this->classHelperRegistry->all();
 
         $columns = $this->getTableColumns($this->getTablename($index));
         $columnsToDelete = $columns;
@@ -84,14 +84,18 @@ class MysqlWorker extends AbstractWorker
             }
         }
 
-        if ($classHelper instanceof ClassHelperInterface) {
-            foreach ($classHelper->getSystemColumns() as $name => $type) {
-                if (!array_key_exists($name, $columns)) {
-                    $columnTypeForIndex = $this->renderFieldType($type);
-                    $columnsToAdd[$name] = $columnTypeForIndex;
-                }
+        foreach ($classHelpers as $classHelper) {
+            if ($classHelper instanceof ClassHelperInterface) {
+                if ($classHelper->supports($index)) {
+                    foreach ($classHelper->getSystemColumns() as $name => $type) {
+                        if (!array_key_exists($name, $columns)) {
+                            $columnTypeForIndex = $this->renderFieldType($type);
+                            $columnsToAdd[$name] = $columnTypeForIndex;
+                        }
 
-                unset($columnsToDelete[$name]);
+                        unset($columnsToDelete[$name]);
+                    }
+                }
             }
         }
 

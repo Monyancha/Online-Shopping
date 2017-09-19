@@ -49,6 +49,18 @@ final class PimcoreDriver extends AbstractDriver
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function setClassesParameters(ContainerBuilder $container, MetadataInterface $metadata)
+    {
+        parent::setClassesParameters($container, $metadata);
+
+        if ($metadata->hasClass('model')) {
+            $container->setParameter(sprintf('%s.model.%s.pimcore_class_name', $metadata->getApplicationName(), $metadata->getName()), str_replace('Pimcore\Model\DataObject\\', '', $metadata->getClass('model')));
+        }
+    }
+
+    /**
      * @param ContainerBuilder $container
      * @param MetadataInterface $metadata
      */

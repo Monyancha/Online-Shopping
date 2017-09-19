@@ -1,0 +1,7 @@
+services:
+  coreshop.index.class_helper.product:
+    class: CoreShop\Bundle\CoreBundle\Index\ProductClassHelper
+    arguments:
+      - '%coreshop.model.product.pimcore_class_name%'
+    tags:
+      - { name: coreshop.index.class_helper }

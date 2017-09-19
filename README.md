@@ -23,6 +23,7 @@ CoreShop is a Bundle for [Pimcore](http://www.pimcore.org). It enhances Pimcore 
  - Add Following Call to AppKernel's registerBundlesToCollection function
     ```php
         \CoreShop\Bundle\CoreBundle\Application\RegisterBundleHelper::registerBundles($collection);
+        //\CoreShop\Bundle\CoreBundle\Application\RegisterBundleHelper::registerMembers($collection); //TIP: If you want to use Members, add this line
     ```
  - Add Following to your app/config/config.yml
     ```yml
@@ -33,6 +34,12 @@ CoreShop is a Bundle for [Pimcore](http://www.pimcore.org). It enhances Pimcore 
     ```php bin/console coreshop:install```
  - Activate AdminBundle in Pimcore Extension Manager
  - Optional: Install Demo Data ```php bin/console coreshop:install:demo```
+
+> **Tip:** If you want to use [MembersBundle](https://github.com/dachcom-digital/pimcore-members) with CoreShop
+> you can activate it before installing CoreShop and everything necessary gets setup automatically for you
+> simply add following line to your AppKernel.php ```\CoreShop\Bundle\CoreBundle\Application\RegisterBundleHelper::registerMembers($collection);```
+> and import following config to your config.yml
+> ```"@CoreShopMembersBridgeBundle/Resources/config/app/config.yml"```
 
 # Demo
 You can see a running demo here [CoreShop Demo](https://demo2.coreshop.org)

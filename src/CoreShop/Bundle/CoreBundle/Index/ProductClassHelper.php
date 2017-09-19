@@ -1,4 +1,14 @@
 <?php
+/**
+ * CoreShop.
+ *
+ * This source file is subject to the GNU General Public License version 3 (GPLv3)
+ * For the full copyright and license information, please view the LICENSE.md and gpl-3.0.txt
+ * files that are distributed with this source code.
+ *
+ * @copyright  Copyright (c) 2015-2017 Dominik Pfaffenbauer (https://www.pfaffenbauer.at)
+ * @license    https://www.coreshop.org/license     GNU General Public License version 3 (GPLv3)
+*/
 
 namespace CoreShop\Bundle\CoreBundle\Index;
 
@@ -7,9 +17,28 @@ use CoreShop\Component\Core\Model\ProductInterface;
 use CoreShop\Component\Index\ClassHelper\ClassHelperInterface;
 use CoreShop\Component\Index\Model\IndexableInterface;
 use CoreShop\Component\Index\Model\IndexColumnInterface;
+use CoreShop\Component\Index\Model\IndexInterface;
 
-class ProductClassHelper implements ClassHelperInterface
+final class ProductClassHelper implements ClassHelperInterface
 {
+    protected $productClassName;
+
+    /**
+     * @param $productClassName
+     */
+    public function __construct($productClassName)
+    {
+        $this->productClassName = $productClassName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(IndexInterface $index)
+    {
+        return $this->productClassName === $index->getClass();
+    }
+
     /**
      * {@inheritdoc}
      */

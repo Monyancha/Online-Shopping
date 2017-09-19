@@ -8,7 +8,7 @@
  *
  * @copyright  Copyright (c) 2015-2017 Dominik Pfaffenbauer (https://www.pfaffenbauer.at)
  * @license    https://www.coreshop.org/license     GNU General Public License version 3 (GPLv3)
-*/
+ */
 
 namespace CoreShop\Bundle\CoreBundle\Application;
 
@@ -19,7 +19,8 @@ class RegisterBundleHelper
     /**
      * @param BundleCollection $collection
      */
-    public static function registerBundles(BundleCollection $collection) {
+    public static function registerBundles(BundleCollection $collection)
+    {
         $collection->addBundles([
             new \JMS\SerializerBundle\JMSSerializerBundle(),
 
@@ -54,6 +55,17 @@ class RegisterBundleHelper
             new \Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
             new \Liip\ThemeBundle\LiipThemeBundle(),
             new \Hampe\Bundle\ZurbInkBundle\HampeZurbInkBundle()
+        ], 120);
+    }
+
+    /**
+     * @param BundleCollection $collection
+     */
+    public static function registerMembers(BundleCollection $collection)
+    {
+        $collection->addBundles([
+            new \MembersBundle\MembersBundle(),
+            new \CoreShop\Bundle\MembersBridgeBundle\CoreShopMembersBridgeBundle()
         ], 120);
     }
 }

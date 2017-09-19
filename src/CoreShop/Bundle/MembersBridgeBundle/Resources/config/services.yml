@@ -1,0 +1,8 @@
+services:
+  coreshop.members_bridge.index.helper:
+    class: CoreShop\Bridge\MembersBridge\Index\RestrictionIndexHelper
+    arguments:
+      - '@members.configuration'
+      - '@members.manager.restriction'
+    tags:
+      - { name: coreshop.index.class_helper }
