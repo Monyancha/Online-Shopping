@@ -46,28 +46,26 @@ class Dao
     }
 
     /**
+     * @return QueryBuilder
+     */
+    public function createQueryBuilder()
+    {
+        return new QueryBuilder($this->database);
+    }
+
+    /**
      * Load objects.
      *
-     * @param $condition
-     * @param null|string $orderBy
-     * @param null|int    $limit
-     * @param null|int    $offset
+     * @param QueryBuilder $queryBuilder
      *
      * @return array
      */
-    public function load($condition, $orderBy = null, $limit = null, $offset = null)
+    public function load(QueryBuilder $queryBuilder)
     {
-        $queryBuilder = new QueryBuilder($this->database);
-        $queryBuilder->where($condition);
-        $queryBuilder->orderBy($orderBy);
-        $queryBuilder->setMaxResults($limit);
-        $queryBuilder->setFirstResult($offset);
         $queryBuilder->from($this->model->getQueryTableName(), 'q');
 
-        $this->model->addJoins($queryBuilder);
-
         if ($this->model->getVariantMode() == ListingInterface::VARIANT_MODE_INCLUDE_PARENT_OBJECT) {
-            if (!is_null($orderBy)) {
+            if (!is_null($queryBuilder->getQueryPart('orderBy'))) {
                 $queryBuilder->select('DISTINCT o_virtualObjectId as o_id');
                 $queryBuilder->addGroupBy('o_virtualObjectId');
             } else {
@@ -86,27 +84,23 @@ class Dao
     /**
      * Load Group by values.
      *
-     * @param $fieldname
-     * @param $condition
+     * @param QueryBuilder $queryBuilder
+     * @param $fieldName
      * @param bool $countValues
      *
      * @return array
      */
-    public function loadGroupByValues($fieldname, $condition, $countValues = false)
+    public function loadGroupByValues(QueryBuilder $queryBuilder, $fieldName, $countValues = false)
     {
-        $queryBuilder = new QueryBuilder($this->database);
-        $queryBuilder->where($condition);
         $queryBuilder->from($this->model->getQueryTableName(), 'q');
-        $queryBuilder->groupBy($fieldname);
-        $queryBuilder->orderBy($fieldname);
-
-        $this->model->addJoins($queryBuilder);
+        $queryBuilder->groupBy($fieldName);
+        $queryBuilder->orderBy($fieldName);
 
         if ($countValues) {
             if ($this->model->getVariantMode() == ListingInterface::VARIANT_MODE_INCLUDE_PARENT_OBJECT) {
-                $queryBuilder->select($fieldname . ' as value, count(DISTINCT o_virtualObjectId) as count');
+                $queryBuilder->select($fieldName . ' as value, count(DISTINCT o_virtualObjectId) as count');
             } else {
-                $queryBuilder->select($fieldname . ' as value, count(*) as count');
+                $queryBuilder->select($fieldName . ' as value, count(*) as count');
             }
 
             $stmt = $this->database->executeQuery($queryBuilder->getSQL());
@@ -114,7 +108,7 @@ class Dao
 
             return $result;
         } else {
-            $queryBuilder->select($fieldname);
+            $queryBuilder->select($fieldName);
 
             $stmt = $this->database->executeQuery($queryBuilder->getSQL());
             $queryResult = $stmt->fetchAll();
@@ -122,8 +116,8 @@ class Dao
             $result = [];
 
             foreach ($queryResult as $row) {
-                if ($row[$fieldname]) {
-                    $result[] = $row[$fieldname];
+                if ($row[$fieldName]) {
+                    $result[] = $row[$fieldName];
                 }
             }
 
@@ -134,34 +128,29 @@ class Dao
     /**
      * Load Grouo by Relation values.
      *
-     * @param $fieldname
-     * @param $condition
+     * @param QueryBuilder $queryBuilder
+     * @param $fieldName
      * @param bool $countValues
      *
      * @return array
      */
-    public function loadGroupByRelationValues($fieldname, $condition, $countValues = false)
+    public function loadGroupByRelationValues(QueryBuilder $queryBuilder, $fieldName, $countValues = false)
     {
-        $queryBuilder = new QueryBuilder($this->database);
         $queryBuilder->from($this->model->getRelationTablename(), 'q');
-
-        if ($condition) {
-            $condition = 'WHERE '.$condition;
-        }
 
         if ($countValues) {
             if ($this->model->getVariantMode() == ListingInterface::VARIANT_MODE_INCLUDE_PARENT_OBJECT) {
                 $queryBuilder->select('dest as `value`, count(DISTINCT src_virtualObjectId) as `count`');
-                $queryBuilder->where('fieldname = ' . $fieldname);
+                $queryBuilder->where('fieldname = ' . $fieldName);
             } else {
                 $queryBuilder->select('dest as `value`, count(*) as `count`');
-                $queryBuilder->where('fieldname = ' . $fieldname);
+                $queryBuilder->where('fieldname = ' . $fieldName);
             }
 
             $subQueryBuilder = new QueryBuilder($this->database);
             $subQueryBuilder->select('o_id');
             $subQueryBuilder->from($this->model->getQueryTableName(), 'q');
-            $subQueryBuilder->where($condition);
+            $subQueryBuilder->where($queryBuilder->getQueryPart('where'));
 
             $queryBuilder->andWhere('src in ('.$subQueryBuilder->getSQL().') GROUP BY dest');
 
@@ -171,15 +160,12 @@ class Dao
             return $result;
         } else {
             $queryBuilder->select('dest as `value`, count(DISTINCT src_virtualObjectId) as `count`');
-            $queryBuilder->where('fieldname = ' . $fieldname);
-
-            $query = 'SELECT dest FROM '.$this->model->getRelationTablename().' a '
-                .'WHERE fieldname = '.$this->quote($fieldname);
+            $queryBuilder->where('fieldname = ' . $fieldName);
 
             $subQueryBuilder = new QueryBuilder($this->database);
             $subQueryBuilder->select('o_id');
             $subQueryBuilder->from($this->model->getQueryTableName(), 'q');
-            $subQueryBuilder->where($condition);
+            $subQueryBuilder->where($queryBuilder->getQueryPart('where'));
 
             $queryBuilder->andWhere('src in ('.$subQueryBuilder->getSQL().') GROUP BY dest');
 
@@ -193,33 +179,13 @@ class Dao
     /**
      * Get Count.
      *
-     * @param $condition
-     * @param null $orderBy
-     * @param null $limit
-     * @param null $offset
+     * @param QueryBuilder $queryBuilder
      *
      * @return int
      */
-    public function getCount($condition, $orderBy = null, $limit = null, $offset = null)
+    public function getCount(QueryBuilder $queryBuilder)
     {
-        $queryBuilder = new QueryBuilder($this->database);
-        $queryBuilder->where($condition);
         $queryBuilder->from($this->model->getQueryTableName(), 'q');
-
-        $this->model->addJoins($queryBuilder);
-
-        if ($orderBy) {
-            $queryBuilder->orderBy($orderBy);
-        }
-
-        if ($limit) {
-            if ($offset) {
-                $queryBuilder->setFirstResult($offset);
-                $queryBuilder->setMaxResults($limit);
-            } else {
-                $queryBuilder->setMaxResults($limit);
-            }
-        }
 
         if ($this->model->getVariantMode() == ListingInterface::VARIANT_MODE_INCLUDE_PARENT_OBJECT) {
             $queryBuilder->select('count(DISTINCT o_virtualObjectId)');

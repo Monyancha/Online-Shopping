@@ -15,7 +15,6 @@ namespace CoreShop\Bundle\IndexBundle\Worker\MysqlWorker;
 use CoreShop\Bundle\IndexBundle\Worker\AbstractListing;
 use CoreShop\Bundle\IndexBundle\Worker\MysqlWorker;
 use CoreShop\Bundle\IndexBundle\Worker\MysqlWorker\Listing\Dao;
-use CoreShop\Bundle\ResourceBundle\Controller\EventDispatcherInterface;
 use CoreShop\Component\Index\Condition\ConditionInterface;
 use CoreShop\Component\Index\Listing\ListingInterface;
 use CoreShop\Component\Index\Model\IndexInterface;
@@ -311,7 +310,16 @@ class Listing extends AbstractListing
     {
         //TODO: Load with price filter?!
 
-        $objectRaws = $this->dao->load($this->buildQueryFromConditions(), $this->buildOrderBy(), $this->getLimit(), $this->getOffset());
+        $queryBuilder = $this->dao->createQueryBuilder();
+        $this->addQueryFromConditions($queryBuilder);
+        $this->addOrderBy($queryBuilder);
+        $this->addJoins($queryBuilder);
+
+        $queryBuilder->setMaxResults($this->getLimit());
+        $queryBuilder->setFirstResult($this->getOffset());
+
+        $objectRaws = $this->dao->load($queryBuilder);
+
         $this->totalCount = $this->dao->getLastRecordCount();
         $className = $this->index->getClass();
 
@@ -342,12 +350,17 @@ class Listing extends AbstractListing
      */
     public function getGroupByValues($fieldName, $countValues = false, $fieldNameShouldBeExcluded = true)
     {
+        $queryBuilder = $this->dao->createQueryBuilder();
+
         $excludedFieldName = $fieldName;
         if (!$fieldNameShouldBeExcluded) {
             $excludedFieldName = null;
         }
 
-        return $this->dao->loadGroupByValues($fieldName, $this->buildQueryFromConditions(false, $excludedFieldName, AbstractListing::VARIANT_MODE_INCLUDE), $countValues);
+        $this->addQueryFromConditions($queryBuilder, false, $excludedFieldName, AbstractListing::VARIANT_MODE_INCLUDE);
+        $this->addJoins($queryBuilder);
+
+        return $this->dao->loadGroupByValues($queryBuilder, $fieldName, $countValues);
     }
 
     /**
@@ -355,12 +368,16 @@ class Listing extends AbstractListing
      */
     public function getGroupByRelationValues($fieldName, $countValues = false, $fieldNameShouldBeExcluded = true)
     {
+        $queryBuilder = $this->dao->createQueryBuilder();
+
         $excludedFieldName = $fieldName;
         if (!$fieldNameShouldBeExcluded) {
             $excludedFieldName = null;
         }
 
-        return $this->dao->loadGroupByRelationValues($fieldName, $this->buildQueryFromConditions(false, $excludedFieldName, AbstractListing::VARIANT_MODE_INCLUDE), $countValues);
+        $this->addQueryFromConditions($queryBuilder, false, $excludedFieldName, AbstractListing::VARIANT_MODE_INCLUDE);
+
+        return $this->dao->loadGroupByRelationValues($queryBuilder, $fieldName, $countValues);
     }
 
     /**
@@ -375,16 +392,16 @@ class Listing extends AbstractListing
     /**
      * {@inheritdoc}
      */
-    protected function buildQueryFromConditions($excludeConditions = false, $excludedFieldName = null, $variantMode = null)
+    protected function addQueryFromConditions(QueryBuilder $queryBuilder, $excludeConditions = false, $excludedFieldName = null, $variantMode = null)
     {
         if ($variantMode == null) {
             $variantMode = $this->getVariantMode();
         }
 
-        $preCondition = 'active = 1';
+        $queryBuilder->where('active = 1');
 
         if ($this->getCategory()) {
-            $preCondition .= " AND parentCategoryIds LIKE '%," . $this->getCategory()->getId() . ",%'";
+            $queryBuilder->andWhere('parentCategoryIds LIKE \'%,'.$this->getCategory()->getId().',%\'');
         }
 
         $helpers = $this->getWorker()->getHelpers($this->getIndex());
@@ -394,32 +411,24 @@ class Listing extends AbstractListing
                 $conditions = $helper->preConditionQuery($this->getIndex());
 
                 foreach ($conditions as $cond) {
-                    $preCondition .= " AND " . $this->worker->renderCondition($cond);
+                    $queryBuilder->andWhere($this->worker->renderCondition($cond));
                 }
             }
         }
-
-        $condition = $preCondition;
 
         //variant handling and userspecific conditions
 
         if ($variantMode == AbstractListing::VARIANT_MODE_INCLUDE_PARENT_OBJECT) {
             if (!$excludeConditions) {
-                $userSpecific = $this->buildUserSpecificConditions($excludedFieldName);
-                if ($userSpecific) {
-                    $condition .= ' AND ' . $userSpecific;
-                }
+                $this->addUserSpecificConditions($queryBuilder, $excludedFieldName);
             }
         } else {
             if ($variantMode == AbstractListing::VARIANT_MODE_HIDE) {
-                $condition .= " AND o_type != 'variant'";
+                $queryBuilder->andWhere('o_type != \'variant\'');
             }
 
             if (!$excludeConditions) {
-                $userSpecific = $this->buildUserSpecificConditions($excludedFieldName);
-                if ($userSpecific) {
-                    $condition .= ' AND ' . $userSpecific;
-                }
+                $this->addUserSpecificConditions($queryBuilder, $excludedFieldName);
             }
         }
 
@@ -434,16 +443,13 @@ class Listing extends AbstractListing
 
             //$condition .= ' AND '.$this->dao->buildFulltextSearchWhere(["name"], $searchString); //TODO: Load array("name") from any configuration (cause its also used by indexservice)
         }
-
-        return $condition;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function buildUserSpecificConditions($excludedFieldName = null)
+    protected function addUserSpecificConditions(QueryBuilder $queryBuilder, $excludedFieldName = null)
     {
-        $renderedConditions = [];
         $relationalTableName = $this->worker->getRelationTablename($this->index);
 
         foreach ($this->relationConditions as $fieldName => $condArray) {
@@ -451,7 +457,7 @@ class Listing extends AbstractListing
                 foreach ($condArray as $cond) {
                     $cond = $this->worker->renderCondition($cond);
 
-                    $renderedConditions[] = 'a.o_id IN (SELECT DISTINCT src FROM ' . $relationalTableName . ' WHERE ' . $cond . ')';
+                    $queryBuilder->andWhere('a.o_id IN (SELECT DISTINCT src FROM ' . $relationalTableName . ' WHERE ' . $cond . ')');
                 }
             }
         }
@@ -459,18 +465,16 @@ class Listing extends AbstractListing
         foreach ($this->conditions as $fieldName => $condArray) {
             if ($fieldName !== $excludedFieldName && is_array($condArray)) {
                 foreach ($condArray as $cond) {
-                    $renderedConditions[] = $this->worker->renderCondition($cond);
+                    $queryBuilder->andWhere($this->worker->renderCondition($cond));
                 }
             }
         }
-
-        return implode(' AND ', $renderedConditions);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function buildOrderBy()
+    protected function addOrderBy(QueryBuilder $queryBuilder)
     {
         if (!empty($this->orderKey) && $this->orderKey !== AbstractListing::ORDERKEY_PRICE) {
             $orderKeys = $this->orderKey;
@@ -487,26 +491,21 @@ class Listing extends AbstractListing
                 }
             }
 
-            $orderByStringArray = [];
             foreach ($directionOrderKeys as $keyDirection) {
                 $key = $keyDirection[0];
                 $direction = $keyDirection[1];
 
                 if ($this->getVariantMode() == AbstractListing::VARIANT_MODE_INCLUDE_PARENT_OBJECT) {
                     if (strtoupper($this->order) == 'DESC') {
-                        $orderByStringArray[] = 'max(' . $key . ') ' . $direction;
+                        $queryBuilder->addOrderBy('max(' . $key . ')', $direction);
                     } else {
-                        $orderByStringArray[] = 'min(' . $key . ') ' . $direction;
+                        $queryBuilder->addOrderBy('min(' . $key . ')', $direction);
                     }
                 } else {
-                    $orderByStringArray[] = $key . ' ' . $direction;
+                    $queryBuilder->addOrderBy($key, $direction);
                 }
             }
-
-            return implode(',', $orderByStringArray);
         }
-
-        return null;
     }
 
     /**
@@ -547,33 +546,6 @@ class Listing extends AbstractListing
     public function quote($value)
     {
         return $this->dao->quote($value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getJoins()
-    {
-        if (empty($this->queryJoins)) {
-            return '';
-        }
-
-        $query = '';
-
-        foreach ($this->queryJoins as $table => $tableJoins) {
-            $joinType = isset($tableJoins['type']) ? ' ' . $tableJoins['type'] : ' LEFT';
-
-            if (empty($tableJoins['joinTableAlias'])) {
-                continue;
-            }
-
-            $joinName = $tableJoins['joinTableAlias'];
-            $objectKeyField = isset($tableJoins['objectKeyField']) ? $tableJoins['objectKeyField'] : 'o_id';
-
-            $query .= $joinType . ' JOIN ' . $table . ' as ' . $joinName . ' on `' . $joinName . '`.' . $objectKeyField . ' = a.o_id ';
-        }
-
-        return $query;
     }
 
     /**
@@ -630,7 +602,11 @@ class Listing extends AbstractListing
     public function count()
     {
         if ($this->totalCount === null) {
-            $this->totalCount = $this->dao->getCount($this->buildQueryFromConditions());
+            $queryBuilder = $this->dao->createQueryBuilder();
+            $this->addQueryFromConditions($queryBuilder);
+            $this->addJoins($queryBuilder);
+
+            $this->totalCount = $this->dao->getCount($queryBuilder);
         }
 
         return $this->totalCount;
