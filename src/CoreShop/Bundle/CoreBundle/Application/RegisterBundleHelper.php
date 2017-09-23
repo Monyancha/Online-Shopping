@@ -49,23 +49,13 @@ class RegisterBundleHelper
             new \CoreShop\Bundle\PayumBundle\CoreShopPayumBundle(),
             new \CoreShop\Bundle\CoreBundle\CoreShopCoreBundle(),
 
+            new \MembersBundle\MembersBundle(),
             new \FOS\RestBundle\FOSRestBundle(),
             new \Doctrine\Bundle\DoctrineCacheBundle\DoctrineCacheBundle(),
             new \Payum\Bundle\PayumBundle\PayumBundle(),
             new \Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
             new \Liip\ThemeBundle\LiipThemeBundle(),
             new \Hampe\Bundle\ZurbInkBundle\HampeZurbInkBundle()
-        ], 120);
-    }
-
-    /**
-     * @param BundleCollection $collection
-     */
-    public static function registerMembers(BundleCollection $collection)
-    {
-        $collection->addBundles([
-            new \MembersBundle\MembersBundle(),
-            new \CoreShop\Bundle\MembersBridgeBundle\CoreShopMembersBridgeBundle()
         ], 120);
     }
 }

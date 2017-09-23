@@ -10,7 +10,7 @@
  * @license    https://www.coreshop.org/license     GNU General Public License version 3 (GPLv3)
 */
 
-namespace CoreShop\Bridge\MembersBridge\Index;
+namespace CoreShop\Bundle\CoreBundle\Index;
 
 use CoreShop\Component\Index\ClassHelper\ClassHelperInterface;
 use CoreShop\Component\Index\Condition\Condition;

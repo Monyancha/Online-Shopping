@@ -10,18 +10,9 @@
  * @license    https://www.coreshop.org/license     GNU General Public License version 3 (GPLv3)
  */
 
-namespace CoreShop\Bridge\MembersBridge\Model;
+namespace CoreShop\Component\Core\Repository;
 
-use CoreShop\Component\Core\Model\CustomerGroup as BaseCustomerGroup;
-use CoreShop\Component\Resource\ImplementedByPimcoreException;
-
-class CustomerGroup extends BaseCustomerGroup implements CustomerGroupInterface
+interface RestrictableRepositoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getRoles()
-    {
-        throw new ImplementedByPimcoreException(__CLASS__, __METHOD__);
-    }
+
 }

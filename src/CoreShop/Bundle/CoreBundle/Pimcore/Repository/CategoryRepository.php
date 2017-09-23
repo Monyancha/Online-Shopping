@@ -14,11 +14,37 @@ namespace CoreShop\Bundle\CoreBundle\Pimcore\Repository;
 
 use CoreShop\Bundle\ProductBundle\Pimcore\Repository\CategoryRepository as BaseCategoryRepository;
 use CoreShop\Component\Core\Repository\CategoryRepositoryInterface;
+use CoreShop\Component\Core\Repository\RestrictableRepositoryInterface;
+use CoreShop\Component\Core\Repository\RestrictionListingTrait;
 use CoreShop\Component\Product\Model\CategoryInterface;
+use CoreShop\Component\Resource\Metadata\MetadataInterface;
 use CoreShop\Component\Store\Model\StoreInterface;
+use MembersBundle\Security\RestrictionQuery;
 
-class CategoryRepository extends BaseCategoryRepository implements CategoryRepositoryInterface
+class CategoryRepository extends BaseCategoryRepository implements CategoryRepositoryInterface, RestrictableRepositoryInterface
 {
+    use RestrictionListingTrait {
+        RestrictionListingTrait::__construct as private __restrictionConstruct;
+    }
+
+    /**
+     * @param MetadataInterface $metadata
+     * @param RestrictionQuery $restrictionQuery
+     */
+    public function __construct(MetadataInterface $metadata, RestrictionQuery $restrictionQuery)
+    {
+        parent::__construct($metadata);
+        $this->__restrictionConstruct($restrictionQuery);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getList()
+    {
+        return $this->prepareList(parent::getList());
+    }
+
     /**
      * {@inheritdoc}
      */

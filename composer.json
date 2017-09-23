@@ -62,8 +62,7 @@
     "coreshop/fixture-bundle": "self.version",
     "coreshop/core-bundle": "self.version",
     "coreshop/pimcore": "self.version",
-    "coreshop/members-bridge": "self.version",
-    "coreshop/members-bridge-bundle": "self.version"
+    "coreshop/members-bundle": "self.version"
   },
   "require": {
     "doctrine/orm": "^2.5",
@@ -91,7 +90,6 @@
   },
   "autoload": {
     "psr-4": {
-      "CoreShop\\Bridge\\": "src/CoreShop/Bridge",
       "CoreShop\\Bundle\\": "src/CoreShop/Bundle",
       "CoreShop\\Component\\": "src/CoreShop/Component"
     }

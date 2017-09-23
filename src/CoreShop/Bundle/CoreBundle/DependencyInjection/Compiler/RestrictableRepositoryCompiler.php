@@ -10,9 +10,9 @@
  * @license    https://www.coreshop.org/license     GNU General Public License version 3 (GPLv3)
  */
 
-namespace CoreShop\Bundle\MembersBridgeBundle\DependencyInjection\Compiler;
+namespace CoreShop\Bundle\CoreBundle\DependencyInjection\Compiler;
 
-use CoreShop\Bridge\MembersBridge\Repository\RestrictableRepositoryInterface;
+use CoreShop\Component\Core\Repository\RestrictableRepositoryInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;

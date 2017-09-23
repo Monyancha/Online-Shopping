@@ -1,0 +1,11 @@
+members:
+  user:
+    adapter:
+      class_name: '%coreshop.model.customer.pimcore_class_name%'
+  group:
+    adapter:
+      class_name: '%coreshop.model.customer_group.pimcore_class_name%'
+
+  restriction:
+    enabled: true
+    allowed_objects: ['%coreshop.model.product.pimcore_class_name%', '%coreshop.model.category.pimcore_class_name%']

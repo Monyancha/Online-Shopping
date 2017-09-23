@@ -14,8 +14,91 @@ namespace CoreShop\Component\Core\Model;
 
 use CoreShop\Component\Address\Model\AddressesAwareTrait;
 use CoreShop\Component\Customer\Model\Customer as BaseCustomer;
+use CoreShop\Component\Resource\ImplementedByPimcoreException;
+use MembersBundle\Adapter\User\UserTrait;
 
 class Customer extends BaseCustomer implements CustomerInterface
 {
     use AddressesAwareTrait;
+    use UserTrait;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCustomerGroups()
+    {
+        return $this->getGroups();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCustomerGroups($customerGroups)
+    {
+        return $this->setGroups($customerGroups);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConfirmationToken($confirmationToken)
+    {
+        throw new ImplementedByPimcoreException(__CLASS__, __METHOD__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfirmationToken()
+    {
+        throw new ImplementedByPimcoreException(__CLASS__, __METHOD__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLastLogin($time)
+    {
+        throw new ImplementedByPimcoreException(__CLASS__, __METHOD__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLastLogin()
+    {
+        throw new ImplementedByPimcoreException(__CLASS__, __METHOD__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setGroups($groups)
+    {
+        throw new ImplementedByPimcoreException(__CLASS__, __METHOD__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGroups()
+    {
+        throw new ImplementedByPimcoreException(__CLASS__, __METHOD__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPasswordRequestedAt($date)
+    {
+        throw new ImplementedByPimcoreException(__CLASS__, __METHOD__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPasswordRequestedAt()
+    {
+        throw new ImplementedByPimcoreException(__CLASS__, __METHOD__);
+    }
 }

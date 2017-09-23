@@ -14,10 +14,36 @@ namespace CoreShop\Bundle\CoreBundle\Pimcore\Repository;
 
 use CoreShop\Bundle\ProductBundle\Pimcore\Repository\ProductRepository as BaseProductRepository;
 use CoreShop\Component\Core\Repository\ProductRepositoryInterface;
+use CoreShop\Component\Core\Repository\RestrictableRepositoryInterface;
+use CoreShop\Component\Core\Repository\RestrictionListingTrait;
+use CoreShop\Component\Resource\Metadata\MetadataInterface;
 use CoreShop\Component\Store\Model\StoreInterface;
+use MembersBundle\Security\RestrictionQuery;
 
-class ProductRepository extends BaseProductRepository implements ProductRepositoryInterface
+class ProductRepository extends BaseProductRepository implements ProductRepositoryInterface, RestrictableRepositoryInterface
 {
+    use RestrictionListingTrait {
+        RestrictionListingTrait::__construct as private __restrictionConstruct;
+    }
+
+    /**
+     * @param MetadataInterface $metadata
+     * @param RestrictionQuery $restrictionQuery
+     */
+    public function __construct(MetadataInterface $metadata, RestrictionQuery $restrictionQuery)
+    {
+        parent::__construct($metadata);
+        $this->__restrictionConstruct($restrictionQuery);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getList()
+    {
+        return $this->prepareList(parent::getList());
+    }
+
     /**
      * {@inheritdoc}
      */
