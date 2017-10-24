@@ -16,11 +16,12 @@ coreshop.resource = Class.create({
 
     initialize: function () {
         Ext.Ajax.request({
-            url: '/admin/coreshop/resource/class-map',
+            url: '/admin/coreshop/resource/config',
             success: function (response) {
                 var resp = Ext.decode(response.responseText);
 
-                coreshop.class_map = resp;
+                coreshop.class_map = resp.classMap;
+                coreshop.implementations = resp.implementations;
 
                 coreshop.broker.fireEvent("afterClassMap", coreshop.class_map);
             }.bind(this)
@@ -37,5 +38,19 @@ coreshop.resource = Class.create({
         this.resources[module].openResource(resource);
     }
 });
+
+coreshop.deepCloneStore = function (source) {
+    source = Ext.isString(source) ? Ext.data.StoreManager.lookup(source) : source;
+
+    var target = Ext.create(source.$className, {
+        model: source.model,
+    });
+
+    target.add(Ext.Array.map(source.getRange(), function (record) {
+        return record.copy();
+    }));
+
+    return target;
+};
 
 coreshop.global.resource = new coreshop.resource();

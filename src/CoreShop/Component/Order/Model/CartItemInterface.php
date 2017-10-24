@@ -13,8 +13,9 @@
 namespace CoreShop\Component\Order\Model;
 
 use CoreShop\Component\Resource\Pimcore\Model\PimcoreModelInterface;
+use CoreShop\Component\StorageList\Model\StorageListItemInterface;
 
-interface CartItemInterface extends ProposalItemInterface, PimcoreModelInterface
+interface CartItemInterface extends ProposalItemInterface, PimcoreModelInterface, StorageListItemInterface
 {
     /**
      * @return bool

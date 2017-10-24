@@ -1,6 +1,8 @@
+# CoreShop Order Bundle
+
 ## Installation
-```
-composer require coreshop/order-bundle dev-master
+```bash
+$ composer require coreshop/order-bundle:^2.0
 ```
 
 ### Adding required bundles to kernel
@@ -36,17 +38,17 @@ public function registerBundles()
 ### Updating database schema
 Run the following command.
 
-```
-php bin/console doctrine:schema:update --force
+```bash
+$ php bin/console doctrine:schema:update --force
 ```
 
 ### Install Pimcore Entities
 
-```
-php bin/console coreshop:resources:install
+```bash
+$ php bin/console coreshop:resources:install
 ```
 
-Learn more about overriding Pimcore Classes [here](../03_Development/12_Override_CoreShop_Classes.md)
+Learn more about overriding Pimcore Classes [here](../03_Development/01_Extending_Guide/03_Extend_CoreShop_DataObjects.md)
 
 ## Usage
 
@@ -72,10 +74,10 @@ The Order Bundle provides you with basic information needed for ordering: Orders
 ## Cart Price Rule
 
 ### Conditions
-Learn more about adding new Conditions [here](../03_Development/14_Rules/02_Custom_Conditions.md)
+Learn more about adding new Conditions [here](../03_Development/01_Extending_Guide/04_Extending_Rule_Conditions.md)
 
 ### Actions
-Learn more about adding new Actions [here](../03_Development/14_Rules/02_Custom_Actions.md)
+Learn more about adding new Actions [here](../03_Development/01_Extending_Guide/04_Extending_Rule_Actions.md)
 
 ## Pimcore UI
 

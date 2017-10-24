@@ -1,0 +1,42 @@
+<?php
+/**
+ * CoreShop.
+ *
+ * This source file is subject to the GNU General Public License version 3 (GPLv3)
+ * For the full copyright and license information, please view the LICENSE.md and gpl-3.0.txt
+ * files that are distributed with this source code.
+ *
+ * @copyright  Copyright (c) 2015-2017 Dominik Pfaffenbauer (https://www.pfaffenbauer.at)
+ * @license    https://www.coreshop.org/license     GNU General Public License version 3 (GPLv3)
+ */
+
+namespace CoreShop\Component\StorageList\Model;
+
+use CoreShop\Component\Resource\Model\ResourceInterface;
+
+interface StorageListItemInterface extends ResourceInterface
+{
+    /**
+     * @return StorageListProductInterface
+     */
+    public function getProduct();
+
+    /**
+     * @param StorageListProductInterface $product
+     *
+     * @return static
+     */
+    public function setProduct($product);
+
+    /**
+     * @return int
+     */
+    public function getQuantity();
+
+    /**
+     * @param $quantity
+     *
+     * @return static
+     */
+    public function setQuantity($quantity);
+}

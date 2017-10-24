@@ -61,8 +61,8 @@
                                 "datatype": "data",
                                 "relationType": false,
                                 "invisible": false,
-                                "visibleGridView": false,
-                                "visibleSearch": false
+                                "visibleGridView": true,
+                                "visibleSearch": true
                             }
                         ],
                         "name": "localizedfields",
@@ -135,7 +135,7 @@
     },
     "icon": null,
     "previewUrl": null,
-    "group": null,
+    "group": "CoreShop",
     "propertyVisibility": {
         "grid": {
             "id": true,

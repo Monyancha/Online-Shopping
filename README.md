@@ -13,10 +13,10 @@ See https://github.com/coreshop/CoreShop/tree/coreshop1**
 
 CoreShop is a Bundle for [Pimcore](http://www.pimcore.org). It enhances Pimcore with eCommerce features.
 
-![CoreShop Interface](docs/img/screenshot.png)
+![CoreShop Interface](docs/img/screenshot5.png)
 
 # Requirements
-* Pimcore 5. Only with Build 118 or greater.
+* Pimcore 5.0.0
 
 # Installation
  - Install with composer ```composer require coreshop/core-shop dev-master```
@@ -35,11 +35,17 @@ CoreShop is a Bundle for [Pimcore](http://www.pimcore.org). It enhances Pimcore 
  - Activate AdminBundle in Pimcore Extension Manager
  - Optional: Install Demo Data ```php bin/console coreshop:install:demo```
 
+
 > **Tip:** If you want to use [MembersBundle](https://github.com/dachcom-digital/pimcore-members) with CoreShop
 > you can activate it before installing CoreShop and everything necessary gets setup automatically for you
 > simply add following line to your AppKernel.php ```\CoreShop\Bundle\CoreBundle\Application\RegisterBundleHelper::registerMembers($collection);```
 > and import following config to your config.yml
 > ```"@CoreShopMembersBridgeBundle/Resources/config/app/config.yml"```
+
+# Further Information
+ - [Website](https://www.coreshop.org)
+ - [Documentation](https://www.coreshop.org/docs/latest)
+ - [Pimcore Forum](https://talk.pimcore.org)
 
 # Demo
 You can see a running demo here [CoreShop Demo](https://demo2.coreshop.org)
@@ -54,5 +60,5 @@ Copyright: [Dominik Pfaffenbauer](https://www.pfaffenbauer.at)
 For licensing details please visit [LICENSE.md](LICENSE.md) 
 
 ## Screenshots
-![CoreShop Interface](docs/img/screenshot2.png)
-![CoreShop Interface](docs/img/screenshot3.png)
+![CoreShop Interface](docs/img/screenshot5-2.png)
+![CoreShop Interface](docs/img/screenshot5-3.png)

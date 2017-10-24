@@ -15,7 +15,6 @@ namespace CoreShop\Component\Core\Model;
 use CoreShop\Component\Order\Model\QuoteInterface as BaseQuoteInterface;
 use CoreShop\Component\Shipping\Model\CarrierAwareInterface;
 
-
 interface QuoteInterface extends BaseQuoteInterface, CarrierAwareInterface
 {
 

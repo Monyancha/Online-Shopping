@@ -71,25 +71,24 @@ final class ProductClassHelper implements ClassHelperInterface
             $parentCategoryIds = [];
 
             $categories = $indexable->getCategories();
+            $categories = is_array($categories) ? $categories : [];
 
-            if ($categories) {
-                foreach ($categories as $c) {
-                    if ($c instanceof CategoryInterface) {
-                        $categoryIds[$c->getId()] = $c->getId();
+            foreach ($categories as $c) {
+                if ($c instanceof CategoryInterface) {
+                    $categoryIds[$c->getId()] = $c->getId();
 
-                        $parents = $c->getHierarchy();
+                    $parents = $c->getHierarchy();
 
-                        foreach ($parents as $p) {
-                            $parentCategoryIds[] = $p->getId();
-                        }
+                    foreach ($parents as $p) {
+                        $parentCategoryIds[] = $p->getId();
                     }
                 }
             }
-
+            
             return [
                 'categoryIds' => implode(',', $categoryIds) . ',',
                 'parentCategoryIds' => ',' . implode(',', $parentCategoryIds) . ',',
-                'stores' => ','.@implode(',', $indexable->getStores()).','
+                'stores' => ',' . @implode(',', $indexable->getStores()) . ','
             ];
         }
 
