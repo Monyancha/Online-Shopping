@@ -33,7 +33,7 @@ Password: coreshop
 ```
 
 ## Copyright and license 
-Copyright: [Dominik Pfaffenbauer](https://www.pfaffenbauer.at)
+Copyright: [Enock Monyancha]
 For licensing details please visit [LICENSE.md](LICENSE.md) 
 
 ## Screenshots
