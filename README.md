@@ -17,12 +17,6 @@
     `php bin/console coreshop:install`
  - Optional: Install Demo Data `php bin/console coreshop:install:demo`
 
-# Further Information
- - [Website](https://www.coreshop.org)
- - [Documentation](https://www.coreshop.org/docs/latest)
- - [Pimcore Forum](https://talk.pimcore.org)
- - [Help translate CoreShop](https://crowdin.com/project/coreshop)
-
 **Backend Credentials**
 
 ```
